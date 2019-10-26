@@ -2,7 +2,7 @@
 
 A short time lucky charm wheel spin as a inter class project was designed and demonstrated using MSP430 FR4133. The objective was to implement debounce effect, Low power mode operation and Pulse width modulation techniques, along with display of the count.
 
-Requirements:
+# Requirements:
 
 Texas Instruments MSP430FR4133
 
