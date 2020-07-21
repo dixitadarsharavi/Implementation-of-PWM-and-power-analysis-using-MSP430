@@ -50,37 +50,6 @@ int main(void)
      }
 
 
-//int i = 0x01;
-//
-//while(1)
-//{
-//    LCD_E_selectDisplayMemory(LCD_E_BASE, LCD_E_DISPLAYSOURCE_MEMORY);
-////    switch(*mode)
-////    {
-////        case STARTUP_MODE:        // Startup mode
-////
-////
-////            // Cycle through all LCD segments and display instruction message
-////            if (i <= 0x80)
-//           // {
-//                LCDMEM[pos1] = LCDMEM[pos1+1] = i;
-//                LCDMEM[pos2] = LCDMEM[pos2+1] = i;
-//                LCDMEM[pos3] = LCDMEM[pos3+1] = i;
-//                LCDMEM[pos4] = LCDMEM[pos4+1] = i;
-//                LCDMEM[pos5] = LCDMEM[pos5+1] = i;
-//                LCDMEM[pos6] = LCDMEM[pos6+1] = i;
-//                LCDMEM[12] = LCDMEM[13] = i;
-//                i<<=1;
-//            //
-//        //case COUNTER_MODE:
-//             //clearLCD();
-//            displayScrollText("COUNTING MODE");
-//
-//              break;
-
-
-
-//    }
 
               displayScrollText("COUNTING MODE");
         //__bis_SR_register(LPM3_bits);
@@ -166,47 +135,7 @@ __interrupt void PORT1_ISR(void)
                 start=start+1;
 
                 LCD_displayNumber(start);
-//                while(1)
-//                {
-//                start=start+1;
-//                __delay_cycles(1000000);
-//                //LCD_displayNumber(start);
-//                }
-                     //displayScrollText("ARD");
 
-
-
-
-                    //P1DIR |= BIT6 | BIT7;                      // P1.6 and P1.7 output
-                    //P1SEL0 |= BIT6 | BIT7;                     // P1.6 and P1.7 options select
-                        // Disable the GPIO power-on default high-impedance mode to activate
-                        // previously configured port settings
-                        //PM5CTL0 &= ~LOCKLPM5;
-                        //if((*Seconds)%2==0)
-                    //{
-                        //TA0CCR0 = 128;                             // PWM Period/2
-                        //TA0CCTL1 = OUTMOD_7;                       // TACCR1 toggle/set
-                        //TA0CCR1 = 32;                              // TACCR1 PWM duty cycle
-                        //TA0CCTL2 = OUTMOD_7;                       // TACCR2 toggle/set
-                        //TA0CCR2 = 96;                              // TACCR2 PWM duty cycle
-                        //TA0CTL = TASSEL_1 | MC_3;
-                      // }
-                    //else
-                        //if((*Seconds)%2==0)
-                        //{
-                            //TA0CCR0 = 128;                             // PWM Period/2
-                           //TA0CCTL1 = OUTMOD_7;                       // TACCR1 toggle/set
-                           //TA0CCR1 = 96;                              // TACCR1 PWM duty cycle
-                           //TA0CCTL2 = OUTMOD_7;                       // TACCR2 toggle/set
-                          //TA0CCR2 = 32;                              // TACCR2 PWM duty cycle
-                          //TA0CTL = TASSEL_1 | MC_3;
-                                        // }
-
-                        //a= atoi(Seconds);
-
-
-
-                // Start debounce timer
                 Timer_A_initUpMode(TIMER_A0_BASE, &initUpParam_A0);
             }
         case P1IV_P1IFG3 : break;
