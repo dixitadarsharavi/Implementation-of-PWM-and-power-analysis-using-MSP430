@@ -1,6 +1,9 @@
 # Implementation-of-PWM-and-power-analysis-using-MSP430
 
-A short time lucky charm wheel spin as a inter class project was designed and demonstrated using MSP430 FR4133. The objective was to implement debounce effect, Low power mode operation and Pulse width modulation techniques, along with display of the count.
+A short time lucky charm wheel spin as a inter class project was designed and demonstrated using MSP430 FR4133. The objective was to implement
+Debounce effect,
+Low power mode operation,
+Pulse width modulation techniques, along with display of the count.
 
 # Requirements:
 

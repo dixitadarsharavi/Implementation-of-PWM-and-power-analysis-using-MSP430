@@ -1,3 +1,9 @@
+/*
+ * LCD.c
+ * Created on: 10-June-2019
+ * Author: Adarsha dixit
+*/
+
 #include "lcd.h"
 
 // Memory locations for LCD characters
@@ -110,9 +116,8 @@ void LCD_init()
 }
 
 /*
- * Displays input character at given LCD digit/position
- * Only spaces, numeric digits, and uppercase letters are accepted characters
- */
+ * Displays input character at given LCD digit/position (only spaces, numeric digits, and uppercase letters are accepted characters)
+*/
 void LCD_showChar(char c, int position)
 {
     if (c == ' ')
@@ -146,7 +151,6 @@ void LCD_displayNumber(unsigned long val)
     unsigned long div[6];
     unsigned long mod[6];
     unsigned long err;
-
     err = val / 1000000;
     if (err > 0)
     {
@@ -185,7 +189,6 @@ void LCD_displayNumber(unsigned long val)
                 LeadingZeros++;
             }
         }
-
         i = NUM_CHAR - 1;
         LCD_showChar( div[i] + '0', i );
     }
@@ -193,7 +196,7 @@ void LCD_displayNumber(unsigned long val)
 
 /*
  * Scrolls input string across LCD screen from left to right
- */
+*/
 void displayScrollText(char *msg)
 {
     int length = strlen(msg);

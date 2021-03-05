@@ -1,10 +1,20 @@
-#include "lcd.h"
+/*
+ * Main.c
+ * Created on: 31-May-2019
+ * Author: Adarsha dixit
+*/
 
+#include "lcd.h"
 #include<driverlib.h>
 
 volatile unsigned char * mode = &BAKMEM4_L;
-volatile unsigned char * S1buttonDebounce = &BAKMEM2_L;       // S1 button debounce flag
-volatile unsigned char * S2buttonDebounce = &BAKMEM2_H;       // S2 button debounce flag
+
+// S1 button debounce flag
+volatile unsigned char * S1buttonDebounce = &BAKMEM2_L;
+
+// S2 button debounce flag
+volatile unsigned char * S2buttonDebounce = &BAKMEM2_H;
+
 volatile unsigned int holdCount = 0;
 volatile unsigned long start = 0;
 
@@ -22,46 +32,39 @@ Timer_A_initUpModeParam initUpParam_A0 =
 
 int main(void)
 {
-    WDTCTL = WDTPW | WDTHOLD;  // stop watchdog timer
+    // stop watchdog timer
+    WDTCTL = WDTPW | WDTHOLD;
 
-     if (SYSRSTIV == SYSRSTIV_LPM5WU)
-        {
-            //Init_GPIO();
-            __enable_interrupt();
+    if (SYSRSTIV == SYSRSTIV_LPM5WU)
+    {
+        //Init_GPIO();
+        __enable_interrupt();
+    }
+    else
+    {
+        Init_GPIO();
+        LCD_init();
+        P1DIR |= BIT6 | BIT7;                      // P1.6 and P1.7 output
+        P1SEL0 |= BIT6 | BIT7;                     // P1.6 and P1.7 options select
 
+        GPIO_clearInterrupt(GPIO_PORT_P1, GPIO_PIN2);
+        GPIO_clearInterrupt(GPIO_PORT_P2, GPIO_PIN6);
 
-        }
-     else
-     {
-    Init_GPIO();
-    LCD_init();
-    P1DIR |= BIT6 | BIT7;                      // P1.6 and P1.7 output
-    P1SEL0 |= BIT6 | BIT7;                     // P1.6 and P1.7 options select
+        // debouncing
+        *S1buttonDebounce = *S2buttonDebounce  = 0;
 
-    GPIO_clearInterrupt(GPIO_PORT_P1, GPIO_PIN2);
-    GPIO_clearInterrupt(GPIO_PORT_P2, GPIO_PIN6);
-
-    *S1buttonDebounce = *S2buttonDebounce  = 0;  // debouncing
-
-    __enable_interrupt();
-
-    displayScrollText("WELCOME TO ARD");
-    //return 0;  not needed as it will terminate the code
-     }
-
-
-
-              displayScrollText("COUNTING MODE");
-        //__bis_SR_register(LPM3_bits);
+        __enable_interrupt();
+        displayScrollText("WELCOME TO ARD");
+    }
+    displayScrollText("COUNTING MODE");
     __bis_SR_register(LPM3_bits | GIE);         // enter LPM3
     __no_operation();
-//}
 }
-
 
 /*
  * GPIO Initialization
- */
+*/
+
 void Init_GPIO()
 {
     // Set all GPIO pins to output low to prevent floating input and reduce power consumption
@@ -108,20 +111,18 @@ void Init_GPIO()
     // to activate previously configured port settings
     PMM_unlockLPM5();
 }
+
 /*
-
-
-
-
-
-
  * PORT1 Interrupt Service Routine
  * Handles S1 button press interrupt
- */
+*/
+
 #pragma vector = PORT1_VECTOR
 __interrupt void PORT1_ISR(void)
 {
-    P1OUT |= BIT0;    // Turn LED1 On
+    // Turn LED1 On
+    P1OUT |= BIT0;
+
     switch(__even_in_range(P1IV, P1IV_P1IFG7))
     {
         case P1IV_NONE : break;
@@ -130,7 +131,8 @@ __interrupt void PORT1_ISR(void)
         case P1IV_P1IFG2 :
             if ((*S1buttonDebounce) == 0)
             {
-                *S1buttonDebounce = 1;                        // First high to low transition
+                // First high to low transition
+                *S1buttonDebounce = 1;
 
                 start=start+1;
 
@@ -149,11 +151,14 @@ __interrupt void PORT1_ISR(void)
 /*
  * PORT2 Interrupt Service Routine
  * Handles S2 button press interrupt
- */
+*/
+
 #pragma vector = PORT2_VECTOR
 __interrupt void PORT2_ISR(void)
 {
-    P4OUT |= BIT0;    // Turn LED2 On
+    // Turn LED2 On
+    P4OUT |= BIT0;
+
     switch(__even_in_range(P2IV, P2IV_P2IFG7))
     {
         case P2IV_NONE : break;
@@ -166,49 +171,44 @@ __interrupt void PORT2_ISR(void)
         case P2IV_P2IFG6 :
             if ((*S2buttonDebounce) == 0)
             {
-                *S2buttonDebounce = 1;                        // First high to low transition
+                // First high to low transition
+                *S2buttonDebounce = 1;
 
-                //clearLCD();
                 displayScrollText("BYE");
                 LCD_displayNumber(start);
 
-                //                Disable the GPIO power-on default high-impedance mode to activate
-                //                previously configured port settings
-                                PM5CTL0 &= ~LOCKLPM5;
-                                if(start%2==0)
-                                {
-                                 TA0CCR0 = 128;                             // PWM Period/2
-                                 TA0CCTL1 = OUTMOD_7;                       // TACCR1 toggle/set
-                                 TA0CCR1 = 32;                              // TACCR1 PWM duty cycle
-                                                       // TACCR2 toggle/set
-                                                              // TACCR2 PWM duty cycle
-                                 TA0CTL = TASSEL_1 | MC_3;
-                                 }
-                                else
-                                {
-                                    TA0CCR0 = 128;                             // PWM Period/2
-                                    TA0CCTL1 = OUTMOD_7;                       // TACCR1 toggle/set
-                                    TA0CCR1 = 96;                              // TACCR1 PWM duty cycle
+                // Disable the GPIO power-on default high-impedance mode to activate previously configured port settings
+                PM5CTL0 &= ~LOCKLPM5;
 
-                                    TA0CTL = TASSEL_1 | MC_3;
-                                }
-                // Start debounce timer
-                Timer_A_initUpMode(TIMER_A0_BASE, &initUpParam_A0);
+                if(start%2==0)
+                {
+                    TA0CCR0 = 128;                             // PWM Period/2
+                    TA0CCTL1 = OUTMOD_7;                       // TACCR1 toggle/set
+                    TA0CCR1 = 32;                              // TACCR1 PWM duty cycle
 
+                    TA0CTL = TASSEL_1 | MC_3;
+                }
+                else
+                {
+                    TA0CCR0 = 128;                             // PWM Period/2
+                    TA0CCTL1 = OUTMOD_7;                       // TACCR1 toggle/set
+                    TA0CCR1 = 96;                              // TACCR1 PWM duty cycle
+
+                    TA0CTL = TASSEL_1 | MC_3;
                 }
 
-
-
+                // Start debounce timer
+                Timer_A_initUpMode(TIMER_A0_BASE, &initUpParam_A0);
+            }
         case P2IV_P2IFG7 : break;
     }
-
 }
-
 
 /*
  * Timer A0 Interrupt Service Routine
  * Used as button debounce timer
- */
+*/
+
 #pragma vector = TIMER0_A0_VECTOR
 __interrupt void TIMER0_A0_ISR (void)
 {
@@ -221,11 +221,8 @@ __interrupt void TIMER0_A0_ISR (void)
             // Stop Timer A0
             Timer_A_stop(TIMER_A0_BASE);
 
-            // Change mode
-           // if (*mode == STARTUP_MODE)
-                //(*mode) = COUNT_MODE;
-
-            __bic_SR_register_on_exit(LPM3_bits);                // exit LPM3
+            // exit LPM3
+            __bic_SR_register_on_exit(LPM3_bits);
         }
     }
 
@@ -248,9 +245,8 @@ __interrupt void TIMER0_A0_ISR (void)
     {
         // Stop timer A0
         Timer_A_stop(TIMER_A0_BASE);
-        //if (*mode == COUNT_MODE)
-            //if (!(*stopWatchRunning))
-                __bic_SR_register_on_exit(LPM3_bits);            // exit LPM3
 
+        // exit LPM3
+        __bic_SR_register_on_exit(LPM3_bits);
     }
 }
